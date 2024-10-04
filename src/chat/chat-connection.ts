@@ -84,11 +84,20 @@ function setupChatDistributor(chatId: string) {
         connection.on('open', () => {
             connectionsToDistributor.set(connection.peer, connection);
 
-            broadcastEvent({
-                type: 'join',
-                sender: connection.peer,
-                timestamp: new Date(),
-            });
+            if (connectionsToDistributor.size === 1) {
+                broadcastEvent({
+                    type: 'chat-created',
+                    sender: connection.peer,
+                    timestamp: new Date(),
+                    chatId,
+                });
+            } else {
+                broadcastEvent({
+                    type: 'join',
+                    sender: connection.peer,
+                    timestamp: new Date(),
+                });
+            }
         });
 
         connection.on('data', (data) => {

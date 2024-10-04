@@ -1,0 +1,8 @@
+#chat-header {
+    @apply transition;
+}
+
+html:not([data-scroll-top='0']) #chat-header {
+    @apply backdrop-blur-md;
+    @apply bg-primary-purple/15;
+}

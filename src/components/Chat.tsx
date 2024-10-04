@@ -3,24 +3,27 @@ import './chat.css';
 import { useSignal } from '@preact/signals';
 import { useRoute } from 'preact-iso';
 import { useChatConnection } from '../chat/chat-connection';
-import { InlineChatEvent } from './InlineChatEvent';
+import { ChatEvent } from './ChatEvent';
 import { PaperAirplaneIcon } from '../icons/PaperAirplaneIcon';
 import { useEffect, useRef } from 'preact/hooks';
 import { ChatBubbleLeftRight } from '../icons/ChatBubbleLeftRight';
+import { RefObject } from 'preact';
+import { debounceWithAnimationFrame } from '../util/debounce';
+import { InlineChatEvent } from './InlineChatEvent';
 
-const debounce = (fn: any) => {
-    let frame: number | null = null;
-
-    return (...params: any) => {
-        if (frame != null) {
-            cancelAnimationFrame(frame);
+function useStoreScrollPosition(elementRef: RefObject<HTMLElement | null>) {
+    const storeCurrentScrollPosition = debounceWithAnimationFrame(() => {
+        if (elementRef.current != null) {
+            document.documentElement.dataset.scrollTop = elementRef.current.scrollTop.toString();
         }
+    });
 
-        frame = requestAnimationFrame(() => {
-            fn(...params);
-        });
-    };
-};
+    useEffect(() => {
+        storeCurrentScrollPosition();
+    }, [elementRef.current]);
+
+    return storeCurrentScrollPosition;
+}
 
 export function Chat() {
     const route = useRoute();
@@ -35,13 +38,6 @@ export function Chat() {
         createChatDistributor,
     });
 
-    const storeCurrentScrollPosition = debounce(() => {
-        if (eventsContainerRef.current != null) {
-            document.documentElement.dataset.scrollTop =
-                eventsContainerRef.current.scrollTop.toString();
-        }
-    });
-
     useEffect(() => {
         eventsContainerRef.current?.scrollTo({
             top: eventsContainerRef.current.scrollHeight,
@@ -51,6 +47,8 @@ export function Chat() {
 
     const newChatMessage = useSignal('');
 
+    const storeCurrentScrollPosition = useStoreScrollPosition(eventsContainerRef);
+
     function onSendMessage() {
         sendMessage(newChatMessage.value);
         newChatMessage.value = '';
@@ -58,7 +56,7 @@ export function Chat() {
 
     return (
         <div
-            className={'bg-default flex h-screen flex-col overflow-scroll bg-cover'}
+            className={'flex h-screen flex-col overflow-scroll bg-default bg-cover bg-bottom'}
             ref={eventsContainerRef}
             onScroll={storeCurrentScrollPosition}
         >
@@ -88,13 +86,13 @@ export function Chat() {
 
             <div
                 className={
-                    'bg-primary-purple/50 sticky bottom-0 flex flex-row gap-2 p-4 backdrop-blur-sm'
+                    'sticky bottom-0 flex flex-row gap-2 bg-primary-purple/50 p-4 backdrop-blur-sm'
                 }
             >
                 <input
                     type={'text'}
                     className={
-                        'focus:ring-primary-purple flex-grow rounded-md border-none bg-white/25 text-white'
+                        'flex-grow rounded-md border-none bg-white/25 text-white focus:ring-primary-purple'
                     }
                     value={newChatMessage}
                     onChange={(event) => (newChatMessage.value = event.currentTarget.value)}
@@ -102,7 +100,7 @@ export function Chat() {
 
                 <button
                     className={
-                        'bg-primary-purple/50 sticky bottom-0 aspect-square rounded-md p-2 font-semibold text-purple-100'
+                        'sticky bottom-0 aspect-square rounded-md bg-primary-purple/50 p-2 font-semibold text-purple-100'
                     }
                     onClick={onSendMessage}
                 >

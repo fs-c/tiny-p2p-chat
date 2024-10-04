@@ -52,7 +52,7 @@ export function Home() {
     return (
         <div
             className={
-                'bg-default flex min-h-screen flex-col items-center justify-between bg-cover bg-no-repeat p-4'
+                'flex min-h-screen flex-col items-center justify-between bg-default bg-cover bg-bottom'
             }
         >
             <div
@@ -70,7 +70,7 @@ export function Home() {
 
             <div
                 className={
-                    'flex flex-col items-center justify-center gap-4 rounded-lg bg-gray-400/50 p-4 backdrop-blur-md'
+                    'flex flex-col items-center justify-center gap-4 rounded-lg bg-gray-400/20 p-4 backdrop-blur-md'
                 }
             >
                 <div className={'flex flex-row gap-2'} ref={chatIdInputsRef}>
@@ -80,7 +80,7 @@ export function Home() {
                             key={index}
                             type={'text'}
                             className={
-                                'focus:ring-primary-purple h-14 w-14 rounded-lg border-none bg-white/50 text-center text-2xl font-semibold text-white shadow-md placeholder:text-white/50'
+                                'h-14 w-14 rounded-lg border-none bg-transparent text-center text-2xl font-semibold text-white shadow-md ring-1 ring-inset ring-white/50 placeholder:text-white/50 focus:ring-2 focus:ring-inset focus:ring-primary-purple'
                             }
                             placeholder={'0'}
                             onFocus={() => chatIdInputs.value[index]?.select()}
@@ -91,7 +91,7 @@ export function Home() {
 
                 <button
                     className={
-                        'bg-primary-purple/50 flex w-full flex-col items-center rounded-lg px-4 py-2 text-lg font-semibold shadow-lg backdrop-blur-md'
+                        'flex w-full flex-col items-center rounded-lg bg-primary-purple/50 px-4 py-2 text-lg font-semibold shadow-lg backdrop-blur-md'
                     }
                     onClick={() => location.route('/chat/' + chatId.value)}
                 >

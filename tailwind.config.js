@@ -4,10 +4,10 @@ export default {
     theme: {
         extend: {
             colors: {
-                'primary-purple': '#4c00c7',
+                'primary-purple': '#000000  ',
             },
             backgroundImage: {
-                default: "url('/bg.jpg')",
+                default: "url('/bg5_downscaled.jpg')",
             },
         },
     },

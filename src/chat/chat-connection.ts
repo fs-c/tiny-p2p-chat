@@ -189,8 +189,8 @@ export function useChatConnection({
     chatId: string;
     createChatDistributor: boolean;
 }) {
-    // this setup should only run once per chat by the participant who creates the chat
     useEffect(() => {
+        // this setup should only run once per chat by the participant who creates the chat
         if (!createChatDistributor) {
             return;
         }

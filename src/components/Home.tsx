@@ -1,4 +1,4 @@
-import { batch, useSignal } from '@preact/signals';
+import { useSignal } from '@preact/signals';
 import { useLocation } from 'preact-iso';
 import { useEffect, useRef } from 'preact/hooks';
 import type { JSX } from 'preact/jsx-runtime';
@@ -27,21 +27,25 @@ export function Home() {
         // we can't do this for the last input, so we just get the last entered character and
         // overwrite the current input value with it later
         const value = event.currentTarget?.value[event.currentTarget.value.length - 1];
-        batch(() => {
-            chatId.value = chatId.value
-                .split('')
-                .map((char, i) => (i === index ? value[0] : char))
-                .join('');
+        if (value == null) {
+            return;
+        }
 
-            if (index < chatIdInputs.value.length - 1) {
-                chatIdInputs.value[index + 1]?.focus();
-            } else {
-                const currentInputElement = chatIdInputs.value[index];
-                if (currentInputElement != null) {
-                    currentInputElement.value = value;
-                }
+        // update the signal with the new value
+        chatId.value = chatId.value
+            .split('')
+            .map((char, i) => (i === index ? value[0] : char))
+            .join('');
+
+        // focus the next input if it exists and fix up the current input value if necessesary
+        if (index < chatIdInputs.value.length - 1) {
+            chatIdInputs.value[index + 1]?.focus();
+        } else {
+            const currentInputElement = chatIdInputs.value[index];
+            if (currentInputElement != null) {
+                currentInputElement.value = value;
             }
-        });
+        }
     }
 
     function generateNewChatId() {

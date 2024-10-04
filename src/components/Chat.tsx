@@ -3,7 +3,6 @@ import './chat.css';
 import { useSignal } from '@preact/signals';
 import { useRoute } from 'preact-iso';
 import { useChatConnection } from '../chat/chat-connection';
-import { ChatEvent } from './ChatEvent';
 import { PaperAirplaneIcon } from '../icons/PaperAirplaneIcon';
 import { useEffect, useRef } from 'preact/hooks';
 import { ChatBubbleLeftRight } from '../icons/ChatBubbleLeftRight';
@@ -45,9 +44,9 @@ export function Chat() {
         });
     }, [eventsContainerRef.current, chatEvents.value]);
 
-    const newChatMessage = useSignal('');
-
     const storeCurrentScrollPosition = useStoreScrollPosition(eventsContainerRef);
+
+    const newChatMessage = useSignal('');
 
     function onSendMessage() {
         sendMessage(newChatMessage.value);
@@ -73,39 +72,35 @@ export function Chat() {
                     </p>
                 </div>
 
-                <span className={'font-mono font-semibold tracking-widest opacity-70'}>
-                    {chatId}
-                </span>
+                <span className={'font-mono tracking-widest opacity-70'}>{chatId}</span>
             </div>
 
-            <div className={'flex-grow'}>
+            <div className={'mx-auto w-full max-w-screen-md flex-grow'}>
                 {chatEvents.value.map((event, index) => (
                     <InlineChatEvent key={index} event={event} />
                 ))}
             </div>
 
-            <div
-                className={
-                    'sticky bottom-0 flex flex-row gap-2 bg-primary-purple/50 p-4 backdrop-blur-sm'
-                }
-            >
-                <input
-                    type={'text'}
-                    className={
-                        'flex-grow rounded-md border-none bg-white/25 text-white focus:ring-primary-purple'
-                    }
-                    value={newChatMessage}
-                    onChange={(event) => (newChatMessage.value = event.currentTarget.value)}
-                />
+            <div className={'sticky bottom-0 bg-primary-purple/50 p-4 backdrop-blur-sm'}>
+                <div className={'mx-auto flex max-w-screen-md flex-row gap-2'}>
+                    <input
+                        type={'text'}
+                        className={
+                            'flex-grow rounded-md border-none bg-white/25 text-white focus:ring-primary-purple'
+                        }
+                        value={newChatMessage}
+                        onChange={(event) => (newChatMessage.value = event.currentTarget.value)}
+                    />
 
-                <button
-                    className={
-                        'sticky bottom-0 aspect-square rounded-md bg-primary-purple/50 p-2 font-semibold text-purple-100'
-                    }
-                    onClick={onSendMessage}
-                >
-                    <PaperAirplaneIcon />
-                </button>
+                    <button
+                        className={
+                            'sticky bottom-0 aspect-square rounded-md bg-primary-purple/50 p-2 font-semibold text-purple-100'
+                        }
+                        onClick={onSendMessage}
+                    >
+                        <PaperAirplaneIcon />
+                    </button>
+                </div>
             </div>
         </div>
     );

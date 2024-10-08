@@ -1,21 +1,23 @@
-import type { ChatEvent } from '../chat/chat-event';
+import type { FrontendChatEvent } from './Chat';
 
 function formatTimestamp(timestamp: Date) {
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-// can't just call it ChatEvent because that's the name of the type (╯°□°）╯︵ ┻━┻
-export function InlineChatEvent({ event }: { event: ChatEvent }) {
+const displayEvents = ['join', 'leave', 'chat-created', 'message'];
+
+export function FrontendChatEvent({ event }: { event: FrontendChatEvent }) {
     const formattedTimestamp = formatTimestamp(event.timestamp);
-    const displayName = event.sender.slice(0, event.sender.indexOf('-'));
+
+    if (!displayEvents.includes(event.type)) {
+        return <></>;
+    }
 
     return (
-        <div
-            className={'mx-2 my-2 flex flex-col rounded-md bg-white/15 px-4 py-2 backdrop-blur-md'}
-        >
+        <div className={'flex flex-col rounded-md bg-white/15 px-4 py-2 backdrop-blur-md'}>
             <div className={'flex flex-row items-center justify-between'}>
                 <span className={'text-sm font-semibold text-white/75'}>
-                    <span className={'font-mono'}>{displayName}</span>
+                    <span className={'font-mono'}>{event.displayName}</span>
 
                     {event.type === 'join' && <span className={'text-white'}>{' joined'}</span>}
                     {event.type === 'leave' && <span className={'text-white'}>{' left'}</span>}
@@ -31,8 +33,8 @@ export function InlineChatEvent({ event }: { event: ChatEvent }) {
             {event.type === 'chat-created' && (
                 <>
                     <p className={'text-md text-white'}>
-                        <span className={'font-semibold'}>Your chat has been created!</span> Others
-                        can connect to it using the ID
+                        <span className={'font-semibold'}>Your chat has been created!</span> Share
+                        the chat ID with others to let them join.
                     </p>
 
                     <div className={'flex flex-row items-center justify-center gap-2 p-4'}>

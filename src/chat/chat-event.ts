@@ -7,6 +7,7 @@ export const ChatEvent = z.discriminatedUnion('type', [
     BaseChatEvent.extend({ type: z.literal('join') }),
     BaseChatEvent.extend({ type: z.literal('leave') }),
     BaseChatEvent.extend({ type: z.literal('chat-created'), chatId: z.string() }),
+    BaseChatEvent.extend({ type: z.literal('display-name-change'), newDisplayName: z.string() }),
 ]);
 
 export type ChatEvent = z.infer<typeof ChatEvent>;

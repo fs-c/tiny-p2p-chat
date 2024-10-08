@@ -122,10 +122,11 @@ function setupChatDistributor(chatId: string) {
     };
 }
 
+// regular participant setup
 function useConnectionToDistributor(chatId: string) {
     const chatEvents = useSignal<ChatEvent[]>([]);
+    const senderIdToDisplayName = useSignal<Map<string, string>>(new Map());
 
-    // regular participant setup
     const ownPeerId = useSignal<string | null>(null);
     const connectionToDistributor = useSignal<DataConnection | null>(null);
     useEffect(() => {
@@ -141,6 +142,14 @@ function useConnectionToDistributor(chatId: string) {
             connectionToDistributor.value.on('data', (data) => {
                 try {
                     const event = ChatEvent.parse(JSON.parse(data as string));
+
+                    if (event.type === 'display-name-change') {
+                        senderIdToDisplayName.value = new Map(senderIdToDisplayName.value).set(
+                            event.sender,
+                            event.newDisplayName,
+                        );
+                    }
+
                     chatEvents.value = [...chatEvents.value, event];
                 } catch (error) {
                     console.error('error parsing event', error);
@@ -158,28 +167,44 @@ function useConnectionToDistributor(chatId: string) {
         };
     }, []);
 
-    function sendMessage(message: string) {
+    function sendEvent(event: ChatEvent) {
         if (connectionToDistributor.value == null) {
-            console.warn('cannot send message, not connected to root peer');
+            console.warn('cannot send event, not connected to root peer');
             return;
         }
-
-        if (ownPeerId.value == null) {
-            console.warn('cannot send message, own peer id not set');
-            return;
-        }
-
-        const event = {
-            type: 'message',
-            message,
-            sender: ownPeerId.value,
-            timestamp: new Date(),
-        } satisfies ChatEvent;
 
         connectionToDistributor.value.send(JSON.stringify(event));
     }
 
-    return { chatEvents, sendMessage };
+    function sendMessage(message: string) {
+        if (ownPeerId.value == null) {
+            console.warn('cannot send event, own peer id not set');
+            return;
+        }
+
+        sendEvent({
+            type: 'message',
+            message,
+            sender: ownPeerId.value,
+            timestamp: new Date(),
+        });
+    }
+
+    function changeDisplayName(newDisplayName: string) {
+        if (ownPeerId.value == null) {
+            console.warn('cannot send event, own peer id not set');
+            return;
+        }
+
+        sendEvent({
+            type: 'display-name-change',
+            newDisplayName,
+            sender: ownPeerId.value,
+            timestamp: new Date(),
+        });
+    }
+
+    return { chatEvents, sendMessage, changeDisplayName, senderIdToDisplayName, ownPeerId };
 }
 
 export function useChatConnection({
